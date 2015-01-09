@@ -1,2 +1,4 @@
-# spotify-collaborative-app
+spotify-collaborative-app
+=========================
+
 Web Based Company Collaborative Playlist Manager for Spotify
