@@ -1,0 +1,230 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+	<meta charset="UTF-8">
+<title>BPMusicFridays by jph98</title><link type="text/css" rel="stylesheet" href="https://d2b1xqaw2ss8na.cloudfront.net/static/css/spb.9886d7d.css" />
+<!--[if lt IE 9]> <style type="text/css"> .player { background-image: url(https://d2b1xqaw2ss8na.cloudfront.net/static/img/playerbg.png); } </style> <![endif]-->
+<!--[if lt IE 9]> <style type="text/css"> #notifBar { background-image: url(https://d2b1xqaw2ss8na.cloudfront.net/static/img/overlayBg.png); } </style> <![endif]-->
+
+
+
+</head>
+<body class="ab-control playlist view-list black" data-track="spotify:user:jph98:playlist:3HcKvi40yJ6F4ZmjF7anAI">
+	<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-39002830-1']);
+  _gaq.push(['_setDomainName', 'embed.spotify.com']);
+  _gaq.push(['_setAllowLinker', true]);
+  _gaq.push(['_gat._anonymizeIp']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'stats.g.doubleclick.net/dc.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>	<!-- Google Tag Manager -->
+<noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-7BJJ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<script>
+dataLayer = [];
+(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-7BJJ');
+</script>
+<!-- End Google Tag Manager -->	<div id="outerWidgetContainer" class="loading">
+		<div id="widgetContainer">
+		<div id="notifBar">
+	<p id="message"></p>
+	<div class="notifCloseButton sprite"></div>
+</div>
+<div class="player music-paused">
+	<div class="album-art-container clickable">
+		<div class="album-art">
+			<img class="art" src="https://d2b1xqaw2ss8na.cloudfront.net/static/img/defaultCoverL.png" index="-1"/>
+			<div class="clickable play-pause-btn sprite"></div>
+		</div>
+	</div>
+	<div class="divider sprite"></div>
+	<div class="meta">
+		<div class="titles">
+			<div class="track-name ellipsis" onClick="openContextInSpotify();"></div>
+			<div class="artist-name ellipsis" rel="jph98"></div>
+		</div>
+		<div class="right-bar-buttons">
+			<div class="action-buttons-container">
+				<div class="embed sprite"></div>
+			</div>
+		</div>
+		<div class="progress-bar-container sprite">
+			<div class="controls">
+				<div class="skip-back clickable sprite"></div>
+				<div class="time-spent"></div>
+				<div class="skip-fwd clickable sprite"></div>
+				<div class="buffer sprite">
+					<div class="seeker sprite"></div>
+				</div>
+			</div>
+			<div class="context-title">
+				<div class="type-icon sprite"></div>
+				<div class="title-content ellipsis">BPMusicFridays</div>
+			</div>
+		</div>
+	</div>
+	<div class="logo clickable sprite"></div>
+</div>
+<div id="mainContainer" class="main-container"> 
+	<ul id="content" class="content">
+		<li class="track-11nv53N7ZnNTCgyl8yxvYd music-paused item playlist" rel="track" data-track="11nv53N7ZnNTCgyl8yxvYd" data-duration="3:34" data-duration-ms="213693" data-index="0" data-ca="https://d3rt1990lpmkn.cloudfront.net/640/e42c5beba0130dcf5962f6e44891225ddc560489" data-small-ca="https://d3rt1990lpmkn.cloudfront.net/85/e42c5beba0130dcf5962f6e44891225ddc560489" >
+	<div class="ppbtn sprite"></div>
+	<ul class="track-info">
+		<li class="duration" rel="3:34">3:34</li>
+		<li class="track-title 11nv53N7ZnNTCgyl8yxvYd ellipsis" rel="1. Cannonball">1. Cannonball</li>
+		<li class="artist 11nv53N7ZnNTCgyl8yxvYd ellipsis" rel="The Breeders" style="">The Breeders</li>
+	</ul>
+</li>
+<li class="track-2lwwrWVKdf3LR9lbbhnr6R music-paused item playlist" rel="track" data-track="2lwwrWVKdf3LR9lbbhnr6R" data-duration="3:28" data-duration-ms="208466" data-index="1" data-ca="https://d3rt1990lpmkn.cloudfront.net/640/ec4708a437b6dcb82b06d02d94fef74d19cc51e3" data-small-ca="https://d3rt1990lpmkn.cloudfront.net/85/ec4708a437b6dcb82b06d02d94fef74d19cc51e3" >
+	<div class="ppbtn sprite"></div>
+	<ul class="track-info">
+		<li class="duration" rel="3:28">3:28</li>
+		<li class="track-title 2lwwrWVKdf3LR9lbbhnr6R ellipsis" rel="2. Float On">2. Float On</li>
+		<li class="artist 2lwwrWVKdf3LR9lbbhnr6R ellipsis" rel="Modest Mouse" style="">Modest Mouse</li>
+	</ul>
+</li>
+<li class="track-0KdjtHI5Acg6SMoomxQaCb music-paused item playlist" rel="track" data-track="0KdjtHI5Acg6SMoomxQaCb" data-duration="3:27" data-duration-ms="207320" data-index="2" data-ca="https://d3rt1990lpmkn.cloudfront.net/640/bb28c50bfb8edb8218ccbd8927800b2c05970f61" data-small-ca="https://d3rt1990lpmkn.cloudfront.net/85/bb28c50bfb8edb8218ccbd8927800b2c05970f61" >
+	<div class="ppbtn sprite"></div>
+	<ul class="track-info">
+		<li class="duration" rel="3:27">3:27</li>
+		<li class="track-title 0KdjtHI5Acg6SMoomxQaCb ellipsis" rel="3. Black Tongue">3. Black Tongue</li>
+		<li class="artist 0KdjtHI5Acg6SMoomxQaCb ellipsis" rel="Mastodon" style="">Mastodon</li>
+	</ul>
+</li>
+<li class="track-59WN2psjkt1tyaxjspN8fp music-paused item playlist" rel="track" data-track="59WN2psjkt1tyaxjspN8fp" data-duration="5:14" data-duration-ms="313573" data-index="3" data-ca="https://d3rt1990lpmkn.cloudfront.net/640/3326f9517fabd0951b4336c6d52cb8fe09cd6c9a" data-small-ca="https://d3rt1990lpmkn.cloudfront.net/85/3326f9517fabd0951b4336c6d52cb8fe09cd6c9a" >
+	<div class="ppbtn sprite"></div>
+	<ul class="track-info">
+		<li class="duration" rel="5:14">5:14</li>
+		<li class="track-title 59WN2psjkt1tyaxjspN8fp ellipsis" rel="4. Killing In The Name - Remastered">4. Killing In The Name - Remastered</li>
+		<li class="artist 59WN2psjkt1tyaxjspN8fp ellipsis" rel="Rage Against The Machine" style="">Rage Against The Machine</li>
+	</ul>
+</li>
+<li class="track-5FFowl1Ve4S5OehL6OywSg music-paused item playlist" rel="track" data-track="5FFowl1Ve4S5OehL6OywSg" data-duration="2:53" data-duration-ms="173266" data-index="4" data-ca="https://d3rt1990lpmkn.cloudfront.net/640/3e210ca7758d535fa4f6db0a07349b1e62c6e071" data-small-ca="https://d3rt1990lpmkn.cloudfront.net/85/3e210ca7758d535fa4f6db0a07349b1e62c6e071" >
+	<div class="ppbtn sprite"></div>
+	<ul class="track-info">
+		<li class="duration" rel="2:53">2:53</li>
+		<li class="track-title 5FFowl1Ve4S5OehL6OywSg ellipsis" rel="5. Waiting Room">5. Waiting Room</li>
+		<li class="artist 5FFowl1Ve4S5OehL6OywSg ellipsis" rel="Fugazi" style="">Fugazi</li>
+	</ul>
+</li>
+	</ul>
+</div><div id="engageView" class="music-paused">
+	<div class="scroller">
+		<div class="cover-art-container">
+			<div class="left">
+				<div class="album-art-container">
+					<img class="album-art fixed" src="https://d2b1xqaw2ss8na.cloudfront.net/static/img/defaultCoverL.png" data-index="-1"/>
+					<img class="contact-shadow" src=""/>
+				</div>
+			</div>
+			<div class="middle">
+				<div class="album-art-container">
+					<img class="album-art fixed" src="https://d2b1xqaw2ss8na.cloudfront.net/static/img/defaultCoverL.png" data-index="-1"/>
+					<img class="contact-shadow" src=""/>
+				</div>
+			</div>
+			<div class="right">
+				<div class="album-art-container">
+					<img class="album-art fixed" src="https://d2b1xqaw2ss8na.cloudfront.net/static/img/defaultCoverL.png" data-index="-1"/>
+					<img class="contact-shadow" src=""/>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div id="overlays">
+	<div class="overlays-main-container">
+		<div class="overlays-container">
+			<div class="overlay-item-0 overlay-common">
+				<div class="overlay-title">Listen to millions of songs for free!</div>
+				<div class="install-step-button-container">
+					<div class="download-spotify primary-button">Download Spotify</div>
+					<div class="ihavespotify secondary-button">I have Spotify</div>
+				</div>
+				<div class="terms-and-conditions">By downloading Spotify, you agree to Spotify&#39;s <a href="#" class="tc-link">terms &amp; conditions</a> and  <a href="#" class="pp-link">privacy policy</a>.</div>
+			</div>
+			<div class="overlay-item-1 overlay-common">
+				<div class="overlay-title">Spotify failed to launch.</div>
+				<div class="install-step-button-container">
+					<div class="download-spotify primary-button">Download Spotify</div>
+					<div class="helpsupport secondary-button">Help/Support</div>
+				</div>
+				<div class="terms-and-conditions">By downloading Spotify, you agree to Spotify&#39;s <a href="#" class="tc-link">terms &amp; conditions</a> and  <a href="#" class="pp-link">privacy policy</a>.</div>
+			</div>
+			<div class="overlay-item-2 overlay-common">
+				<div style="margin-top:8px;">
+					<div class="embed-container">
+						<div class="overlay-title">Embed code:</div>
+						<div class="input-container"><input class="text-input" type="text" id="embedcodeval"/></div>
+					</div>
+					<div class="embed-container">
+						<div class="overlay-title">Get the link:</div>
+						<div class="input-container"><input class="text-input" type="text" id="copyLinkVal"/></div>
+					</div>
+					<div class="terms-and-conditions">By embedding you agree to the <a href="#" class="embed-tc-link">Terms</a>.</div>
+				</div>
+			</div>
+			<div class="overlay-item-3 overlay-common">
+				<div class="overlay-title">Sorry, we&#39;re not available where you are. Leave your email to stay tuned for good news.</div>
+				<div class="email-controls">
+					<div class="ihavespotify secondary-button">I have Spotify</div>
+					<input class="text-input-email" type="text" placeholder="johndoe@gmail.com" />
+					<div class="submitEmail primary-button">Send</div>
+				</div>
+			</div>
+			<div class="overlay-item-4 overlay-common">
+				<div class="overlay-title">To continue listening for free, sign up to Spotify!</div>
+				<div class="download-spotify download-button">Get Spotify now!</div>
+			</div>
+		</div>
+		<div class="overlay-close-button sprite"></div>
+	</div>
+</div>
+		</div>
+	</div>
+	<script>
+		var context='spotify:user:jph98:playlist:3HcKvi40yJ6F4ZmjF7anAI',
+			contextType = 'playlist',
+			dataContext = 'spotify:user:jph98:playlist:3HcKvi40yJ6F4ZmjF7anAI',
+			tokenData = 'NAowChgKB1Nwb3RpZnkSABoGmAEByAEBJaRksVQSFCaL9K7PEzjQ9zV6zjNOzEIYkFrU',
+			isHandheldDevice = false,
+			renderListView = true,
+			theme = 'black',
+			testLeg = 'control',
+			defaultCoverImg = 'https://d2b1xqaw2ss8na.cloudfront.net/static/img/defaultCoverL.png',
+			shadowWhiteImg = 'https://d2b1xqaw2ss8na.cloudfront.net/static/img/Shadows.png',
+			shadowBlackImg = 'https://d2b1xqaw2ss8na.cloudfront.net/static/img/Shadows-Black.png',
+			spotifyAvailableInCountry = true,
+			currentMarket = 'uk',
+			frameReferrer = "";
+		if( frameReferrer == '' ) {
+			frameReferrer = document.referrer || '';
+		}
+
+		if (typeof window.Spotify === 'undefined') {
+			window.Spotify = {};
+		}
+		Spotify.challengeToken = '9fc51eee80298686bc71e306b02d08d2';
+
+	</script>
+
+	<script src="https://d2b1xqaw2ss8na.cloudfront.net/static/js/md.9886d7d.js"></script>
+
+	
+
+	<div id="fb-root"></div>
+</body>
+</html>
