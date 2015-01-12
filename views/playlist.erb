@@ -18,23 +18,33 @@
 	<div class="section group">
 
 		<h2 style="margin-bottom: 20px">Playlist - <%= @playlist.name %> - <%= @playlist.id %></h2>
+
+		<!-- TODO: Display the current song -->
 		<table id="tracks" class="display" cellspacing="0" width="100%">
 
 			<thead>
+			   <th>Playing?</th>
 			   <th>Artist</th>
 			   <th>Track</th>
 			   <th>Length (secs)</th>
 			   <th>Explicit</th>
-			   <th>Track Number</th>
+			   <th>No. Votes</th>
 			   <th>Vote</th>
 			</thead>
 
 			<tbody>
 				<% unless @trackinfo.size.eql? 0 %>					
 
+					<% advanced_past_current = false %>
+
 					<% @trackinfo.each_key do |t| %>
 						
 						<tr>
+							<td>
+								<% if @artist.eql? @trackinfo[t].artists[0].name and @title.eql? @trackinfo[t].name %>
+									<button type="button" class="btn btn-danger"></button>
+								<% end %>
+							</td>
 							<td>
 								<a href='<%= t %>'>
 									<%= @trackinfo[t].artists[0].name %>
@@ -43,9 +53,32 @@
 							<td><%= @trackinfo[t].name %></td>
 							<td><%= @trackinfo[t].duration_ms / 1000 %></td>
 							<td><%= @trackinfo[t].explicit %></td>
-							<td><%= @trackinfo[t].track_number %></td>
-							<td><button type="button" class="btn btn-success">vote up</button></td>
+							<td>0</td>
+							<td>
+								<!-- TODO: Only allow user to vote if:
+									* after currently playing song
+									* user hasn't voted already
+									* this is not the current song
+								-->
+								<% if advanced_past_current and !@trackinfo[t].votes.include? request.ip and !@artist.eql? @trackinfo[t].artists[0].name and !@title.eql? @trackinfo[t].name %>
+
+									<form action="/vote" method="POST">
+
+										<input type="hidden" name="vote" value="<%= @trackinfo[t].id %>">
+
+										<input type="submit" id="" type="button" class="btn btn-success" value="vote up"></input>
+
+									</form>
+
+								<% end %>
+							</td>
 						</tr>
+
+						<% if @artist.eql? @trackinfo[t].artists[0].name and @title.eql? @trackinfo[t].name %>
+							
+							<% advanced_past_current = true %>
+
+						<% end %>
 
 					<% end %>
 
@@ -55,15 +88,12 @@
 		</table>
 	</div>
 
-	<div class="section group" style="margin-top: 20px; margin-bottom: 40px">
-		<iframe src="https://embed.spotify.com/?uri=spotify:user:jph98:playlist:3HcKvi40yJ6F4ZmjF7anAI" width="300" height="380" frameborder="0" allowtransparency="true"></iframe>
-	</div>
-
 </div>
 
 <script type="text/javascript">
 
     $(document).ready(function() {                    
+
         $('#tracks').dataTable( {
 	        "aLengthMenu": [[20, 50, 100, 250, 500, -1], [20, 50, 100, 250, 500, "All"]],
 	        "iDisplayLength": 100,
@@ -76,15 +106,15 @@
 
 		});       
 	});
+
 </script>
 
 <script type="text/javascript">
 
-	// change to btn-default if the user has already voted, this will remove the vote afterwards
-	$(document).ready(function() {    
+	// TODO: Poll the server for the next song every 2 seconds or SSE
+	$(document).ready(function() {
 
- 		// var artist = $("artist-name").value();
- 		// console.log(artist);
- 	}
 
-</script>
+	});
+
+</script.

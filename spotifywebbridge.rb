@@ -2,10 +2,13 @@
 
 require "yaml"
 require 'rspotify'
+require_relative 'spotifyadapterlinux'
 
-class SpotifyBridge
+class SpotifyWebBridge
 
 	attr_accessor :playlist, :userid
+
+	DEBUG = false
 
 	def initialize()
 
@@ -42,12 +45,11 @@ class SpotifyBridge
 
 		@playlist = get_playlist()
 
-		puts "Listing playlistname: #{@playlist.name} [#{@playlist.id}]"
+		puts "Listing playlistname: #{@playlist.name} [#{@playlist.id}]" if DEBUG
 		p = RSpotify::Playlist.find(@userid, @playlist.id)
 		p.tracks.each do |t|
 
-			#OpenStruct.new(t, 0)
-			puts "\t - #{t.artists[0].name} - #{t.name} - #{t.uri} - #{t.external_ids} - #{t.explicit} - #{t.popularity}"
+			puts "\t - #{t.artists[0].name} - #{t.name} - #{t.uri} - #{t.external_ids} - #{t.explicit} - #{t.popularity}" if DEBUG
 		end
 
 		return p.tracks
@@ -58,19 +60,42 @@ class SpotifyBridge
 
 		tracks = RSpotify::Track.search(name)
 		tracks.each do |t|
-			puts "Found track: #{t.name} - #{t.artists[0].name} - #{t.preview_url}"
+			puts "Found track: #{t.name} - #{t.artists[0].name} - #{t.preview_url}" if DEBUG
 		end
 	end
 
-	def add_track_to_playlist(p, tracks)
+	def reorder_tracks(trackinfo)
 
-		p.add_tracks(track)
+		# Get the track currently playing
+		# Get all tracks after this, order by votes
+		# Store back into the playlist (entire) or look at API to move
+		adapter = SpotifyAdapterLinux.new()
+		artist, title = adapter.songinfo()
+
+		found = false
+		tracks_to_reorder = {}
+		trackinfo.each_key do |k|
+
+			if trackinfo[k].artist.eql? artist and trackinfo[k].name.eql? name
+
+				found = true
+			end
+
+			if found
+
+				tracks_to_reorder[k] = trackinfo[k]
+			end
+		end
+
+		# TODO: Sort the tracks by votes and store
+
 	end
+
 end
 
 if __FILE__ == $0
 
-	sb = SpotifyBridge.new()
+	sb = SpotifyWebBridge.new()
 	tracks = sb.get_tracks()
 	puts tracks
 end
