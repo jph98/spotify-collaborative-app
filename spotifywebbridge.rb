@@ -24,6 +24,7 @@ class SpotifyWebBridge
 
 	def get_playlists() 
 
+		puts "Get playlist for #{@userid}"
 		user = RSpotify::User.find(@userid)
 		return user.playlists
 	end
@@ -48,7 +49,6 @@ class SpotifyWebBridge
 		puts "Listing playlistname: #{@playlist.name} [#{@playlist.id}]" if DEBUG
 		p = RSpotify::Playlist.find(@userid, @playlist.id)
 		p.tracks.each do |t|
-
 			puts "\t - #{t.artists[0].name} - #{t.name} - #{t.uri} - #{t.external_ids} - #{t.explicit} - #{t.popularity}" if DEBUG
 		end
 
@@ -76,7 +76,8 @@ class SpotifyWebBridge
 		tracks_to_reorder = {}
 		trackinfo.each_key do |k|
 
-			if trackinfo[k].artist.eql? artist and trackinfo[k].name.eql? name
+			puts "Track artist: #{trackinfo[k].artist} #{trackinfo[k].name} - #{trackinfo[k].votes.size()}"
+			if trackinfo[k].artist.eql? artist and trackinfo[k].name.eql? title
 
 				found = true
 			end

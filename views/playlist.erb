@@ -24,6 +24,7 @@
 
 			<thead>
 			   <th>Playing?</th>
+			   <th>Cover</th>
 			   <th>Artist</th>
 			   <th>Track</th>
 			   <th>Length (secs)</th>
@@ -33,39 +34,43 @@
 			</thead>
 
 			<tbody>
-				<% unless @trackinfo.size.eql? 0 %>					
+				<% unless @@trackinfo.size.eql? 0 %>					
 
 					<% advanced_past_current = false %>
 
-					<% @trackinfo.each_key do |t| %>
+					<% @@trackinfo.each_key do |t| %>
 						
-						<tr>
-							<td>
-								<% if @artist.eql? @trackinfo[t].artists[0].name and @title.eql? @trackinfo[t].name %>
-									<button type="button" class="btn btn-danger"></button>
+						<tr>	
+							
+							<td style="text-align: center">
+								<% if @artist.eql? @@trackinfo[t].artist and @title.eql? @@trackinfo[t].name %>						
+									<img src="/playing.jpg"></img>	
 								<% end %>
 							</td>
-							<td>
+							
+							<td>								
+								<img src="<%= @@trackinfo[t].imagepreview["url"] %>"></img>
+							</td>
+							<td id="artist">
 								<a href='<%= t %>'>
-									<%= @trackinfo[t].artists[0].name %>
+									<%= @@trackinfo[t].artist %>
 								</a>
 							</td>
-							<td><%= @trackinfo[t].name %></td>
-							<td><%= @trackinfo[t].duration_ms / 1000 %></td>
-							<td><%= @trackinfo[t].explicit %></td>
-							<td>0</td>
+							<td id="title"><%= @@trackinfo[t].name %></td>
+							<td><%= @@trackinfo[t].duration_ms / 1000 %></td>
+							<td><%= @@trackinfo[t].explicit %></td>
+							<td><%= @@trackinfo[t].votes.size() %></td>
 							<td>
 								<!-- TODO: Only allow user to vote if:
 									* after currently playing song
 									* user hasn't voted already
 									* this is not the current song
 								-->
-								<% if advanced_past_current and !@trackinfo[t].votes.include? request.ip and !@artist.eql? @trackinfo[t].artists[0].name and !@title.eql? @trackinfo[t].name %>
+								<% if advanced_past_current and !@@trackinfo[t].votes.include? request.ip and !@artist.eql? @@trackinfo[t].artist and !@title.eql? @@trackinfo[t].name %>
 
 									<form action="/vote" method="POST">
 
-										<input type="hidden" name="vote" value="<%= @trackinfo[t].id %>">
-
+										<input type="hidden" name="vote" value="<%= t %>">
 										<input type="submit" id="" type="button" class="btn btn-success" value="vote up"></input>
 
 									</form>
@@ -74,7 +79,7 @@
 							</td>
 						</tr>
 
-						<% if @artist.eql? @trackinfo[t].artists[0].name and @title.eql? @trackinfo[t].name %>
+						<% if @artist.eql? @@trackinfo[t].artist and @title.eql? @@trackinfo[t].name %>
 							
 							<% advanced_past_current = true %>
 
@@ -102,7 +107,8 @@
 			"bProcessing": true,
 			"bFilter": false,
 			"bPaginate": false,
-			"aoColumnDefs": [{ 'bSortable': false, 'aTargets': [ 0 ] }]
+			"bSortClasses": false,
+			"aoColumnDefs": [{ "sClass": "text-align: center", "aTargets": [ 0 ] }]
 
 		});       
 	});
@@ -112,9 +118,30 @@
 <script type="text/javascript">
 
 	// TODO: Poll the server for the next song every 2 seconds or SSE
-	$(document).ready(function() {
+	// $(document).ready(function() {
 
+	// 	(function poll(){
 
-	});
+	// 	   setTimeout(function(){
+	// 	      $.ajax({ url: "/playing", success: function(data) {
 
-</script.
+	// 	        console.log("Playing " + JSON.stringify(data));
+
+	// 	        // Iterate through all the table rows, set now playing and remove vote buttons
+	// 	        // $('tbody tr').each(function() {
+
+	// 	        // 	$(this).find('td input:checked').each(function () {
+	// 	        // });
+
+		        
+	// 	        poll();
+
+	// 	      }, dataType: "json"});
+	// 	  }, 4000);
+	// 	})();
+
+	// 	console.log("Check currently playing timer setup");
+		
+	// });
+
+</script>
