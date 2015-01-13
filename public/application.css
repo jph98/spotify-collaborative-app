@@ -116,6 +116,7 @@ body {
   text-align: center;
 }
 
-#products tr.even:hover {
-  background-color: yellow;
+#tracks td {
+  padding: 5px 0;
+  vertical-align: middle;
 }

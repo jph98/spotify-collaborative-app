@@ -18,16 +18,17 @@ class SpotifyAdapterLinux
 
 		metadata = metadata.delete("\n")
 		
-		puts metadata if DEBUG
+		puts metadata
 
 		# TODO: Handle dashes etc in title and artist
-		matches = metadata.match(/xesam\:title\"[\sa-z]+\"([\w\s]+)\"/)
+		#matches = metadata.match(/xesam\:title\"[\sa-z]+\"([\w\s]+)\"/)
+		matches = metadata.match(/xesam\:title\"[\sa-z]+\"([\w\s-]+)\"/)
 		title = matches[1]
 
 		matches = metadata.match(/xesam\:artist\"[a-z\s\[\"]+([\w\s]+)/)
 		artist = matches[1]
 
-		puts "Artist: #{artist} - #{title}" if DEBUG
+		puts "Artist: #{artist} - #{title}"
 
 		return artist, title
 	end

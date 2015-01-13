@@ -49,6 +49,8 @@ configure do
 
     tracks.each do |t|
 
+        # TODO: Either change to an array or split into two lists
+        # (played_songs, voted_songs, to_play_songs)
         @@trackinfo[t.id] = OpenStruct.new(:name => t.name,
                                           :album => t.album,
                                           :artist => t.artists[0].name,
@@ -97,6 +99,7 @@ get "/" do
     puts "Currently playing: #{@artist} - #{@title}"
 
     @playlist = @@bridge.playlist()    
+
    	erb :playlist
 end
 
@@ -108,7 +111,6 @@ get "/playing" do
     artist, title = adapter.songinfo()
     puts "Currently playing: #{artist} - #{title}"
     output = {:artist => "#{artist}", :title => "#{title}"}.to_json
-    puts output
     return output
 end
 

@@ -72,26 +72,53 @@ class SpotifyWebBridge
 		adapter = SpotifyAdapterLinux.new()
 		artist, title = adapter.songinfo()
 
-		found = false
+		found_currently_playing = false
+		tracks_played = {}
 		tracks_to_reorder = {}
+
 		trackinfo.each_key do |k|
 
 			puts "Track artist: #{trackinfo[k].artist} #{trackinfo[k].name} - #{trackinfo[k].votes.size()}"
 			if trackinfo[k].artist.eql? artist and trackinfo[k].name.eql? title
 
-				found = true
-			end
-
-			if found
-
+				tracks_played[k] = trackinfo[k]
+				found_currently_playing = true
+				puts "\tPLAYING: #{trackinfo[k].artist} #{trackinfo[k].name} - #{trackinfo[k].votes.size()}"
+				next
+			elsif found_currently_playing
+				puts "\tREORDER: #{trackinfo[k].artist} #{trackinfo[k].name} - #{trackinfo[k].votes.size()}"
 				tracks_to_reorder[k] = trackinfo[k]
+			else
+				tracks_played[k] = trackinfo[k]
+				puts "\tPLAYED: #{trackinfo[k].artist} #{trackinfo[k].name} - #{trackinfo[k].votes.size()}"
 			end
 		end
 
-		# TODO: Sort the tracks by votes and store
+		puts "\n\n"
 
+		puts "\nTracks To Reorder: #{tracks_to_reorder.size()}"
+		tracks_to_reorder = tracks_to_reorder.sort_by { |k,v| v.votes.size() }.reverse
+
+		new_tracks = {}
+		
+		# Store the old tracks in the playlist in the order they were
+		tracks_played.each_key do |k|
+			new_tracks[k] = tracks_played[k]
+		end
+
+		# TODO: Only reorder the track that's been voted
+		tracks_to_reorder.each do |t|
+			id = t[0]
+			obj = t[1]
+			new_tracks[id] = obj
+		end
+
+		new_tracks.each_key do |k|
+			puts "Track: #{k} - #{new_tracks[k].artist} - #{new_tracks[k].name} #{new_tracks[k].votes}"
+		end
+
+		# Store this back into Spotify
 	end
-
 end
 
 if __FILE__ == $0

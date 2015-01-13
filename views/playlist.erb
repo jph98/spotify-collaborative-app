@@ -2,28 +2,60 @@
 
 	<div class="section group" style="margin-top: 20px; margin-bottom: 40px">
 
+		<h2 style="margin-bottom: 20px">Playlist - <%= @playlist.name %> - <%= @playlist.id %></h2>
+
 			<form class="form-horizontal" role="form" method="POST" target="/tracksearch">
 				<div class="form-group">
-			            <label for="channelcontrol" class="col-sm-2 control-label">Search by Track:</label>	
+			            <label for="channelcontrol" class="col-sm-2 control-label">Search for track:</label>	
 			            
 			            <div class="col-sm-10">
-
 			            	<input type="textfield"/>
-
-			            </div>				
+			            </div>
 				</div>
 			</form>
 	</div>	
 
 	<div class="section group">
 
-		<h2 style="margin-bottom: 20px">Playlist - <%= @playlist.name %> - <%= @playlist.id %></h2>
+		<h3 style="margin-top: 40px; margin-bottom: 20px">Currently Playing<img style="margin-left: 10px" src="/playing.jpg"></img></h3>
 
-		<!-- TODO: Display the current song -->
+		<!-- Currently playing song -->
+		<% @@trackinfo.each_key do |t| %>
+
+			<% if @artist.eql? @@trackinfo[t].artist and @title.eql? @@trackinfo[t].name %>						
+				<table id="currentlyplaying" class="display" cellspacing="0" width="100%">
+
+					<thead>
+					   <th>Cover</th>
+					   <th>Artist</th>
+					   <th>Track</th>
+					   <th>Length (secs)</th>
+					   <th>Explicit</th>
+					   <th>No. Votes</th>
+					</thead>
+					<tr>
+						<td><img src="<%= @@trackinfo[t].imagefullsize["url"] %>"></img></td>
+						<td id="artist">
+							<a href='<%= t %>'>
+								<%= @@trackinfo[t].artist %>
+							</a>
+						</td>
+						<td id="title"><%= @@trackinfo[t].name %></td>
+						<td><%= @@trackinfo[t].duration_ms / 1000 %></td>
+						<td><%= @@trackinfo[t].explicit %></td>
+						<td><%= @@trackinfo[t].votes.size() %></td>
+					</tr>
+				</table>
+
+			<% end %>
+		<% end %>
+
+		<h3 style="margin-top: 60px; margin-bottom: 20px">Up Next...</h3>
+
+		<!-- Display the remaining songs to vote on -->
 		<table id="tracks" class="display" cellspacing="0" width="100%">
 
 			<thead>
-			   <th>Playing?</th>
 			   <th>Cover</th>
 			   <th>Artist</th>
 			   <th>Track</th>
@@ -39,14 +71,9 @@
 					<% advanced_past_current = false %>
 
 					<% @@trackinfo.each_key do |t| %>
-						
+
+						<% if advanced_past_current %>						
 						<tr>	
-							
-							<td style="text-align: center">
-								<% if @artist.eql? @@trackinfo[t].artist and @title.eql? @@trackinfo[t].name %>						
-									<img src="/playing.jpg"></img>	
-								<% end %>
-							</td>
 							
 							<td>								
 								<img src="<%= @@trackinfo[t].imagepreview["url"] %>"></img>
@@ -78,6 +105,7 @@
 								<% end %>
 							</td>
 						</tr>
+						<% end %>
 
 						<% if @artist.eql? @@trackinfo[t].artist and @title.eql? @@trackinfo[t].name %>
 							
@@ -94,26 +122,6 @@
 	</div>
 
 </div>
-
-<script type="text/javascript">
-
-    $(document).ready(function() {                    
-
-        $('#tracks').dataTable( {
-	        "aLengthMenu": [[20, 50, 100, 250, 500, -1], [20, 50, 100, 250, 500, "All"]],
-	        "iDisplayLength": 100,
-			"deferRender": true,
-			"bSort": false, 
-			"bProcessing": true,
-			"bFilter": false,
-			"bPaginate": false,
-			"bSortClasses": false,
-			"aoColumnDefs": [{ "sClass": "text-align: center", "aTargets": [ 0 ] }]
-
-		});       
-	});
-
-</script>
 
 <script type="text/javascript">
 
