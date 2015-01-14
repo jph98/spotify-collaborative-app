@@ -1,0 +1,37 @@
+Spotify Collab Client 
+=====================
+
+v0.1
+
+Scheduled Now Playing
+---------------------
+
+Websocket Option
+* Scheduled job that polls local client - rufus
+* Returns the currently playing song as JSON
+	* If this changes then find the highest voted song and move it to currenty playing (Client Side)
+	* Move the currently playing song to played (Client Side)
+
+AJAX Poll
+* Ask for the currently playing song
+
+Voting
+------
+
+* Sort the voted list by number of votes
+* Fix the Vote Up button
+* Change vote to AJAX instead of page refresh
+* Move the song up in terms of the client side list
+
+Controls
+--------
+
+* Add a play button, pause button
+* Add a next button (with votes if it gets to 3)
+
+v0.2
+
+* Replace the backend with NodeJS instead
+* Introduce persistence for the playlist
+* Build a manage playlists option into the app
+* Sync playlists from Spotify and store in local SQLite database

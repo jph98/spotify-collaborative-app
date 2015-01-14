@@ -15,38 +15,19 @@ layout 'layout'
 
 DEBUG = false
 
-def get_preview_image(images)
-    min = 1000
-    preview = ""
-    images.each do |i|
-        if i["height"] < min
-            preview = i
-        end
-    end
-    return preview
-end 
-
-def get_fullsize_image(images)
-    max = 0
-    fullsize = ""
-    images.each do |i|
-        if i["height"] > max
-            fullsize = i
-        end
-    end
-    return fullsize
-end
-
-def check_track_vote(trackinfo)
+def check_track_vote(trackinfo, id)
 
     trackinfo.each_key do |k|
 
         puts "Key: #{k} id #{params["vote"]}"
         if k.eql? id
 
-            return trackinfo[k]
+            puts "\nIncrementing vote for #{trackinfo[k].name} #{trackinfo[k].album}"
+            increment_vote(trackinfo[k])
+            return true
         end    
     end
+    return false
 end
 
 def increment_vote(track)
@@ -144,28 +125,22 @@ post "/vote" do
 
     tracks[@@playing.id] = @@playing
 
-    track = !check_track_vote(@@voted).nil?
-
-    if !track.nil?
-
-        # TODO: Fix returned track from above, TRUE
-        increment_vote(track)
-        @@voted.sort_by { |k,v| v.votes.size() }.reverse
+    if check_track_vote(@@voted, id)
+        #@@voted.sort_by! { |k,v| v.votes.size() }.reverse
+        @@voted.each_key do |k|
+            puts "Track: #{@@voted[k].name} #{@@voted[k].artist} #{@@voted[k].votes}"
+        end
+        puts "Voted done"
+    elsif check_track_vote(@@other, id)            
+        @@voted[id] = @@other[id]
+        @@other.delete(id)
     end
 
-    track = !check_track_vote(@@other).nil?
-
-    if !track.nil?
-        increment_vote(track)
-        
-        # Move this to the voted tracks
-        @@voted[track.id] = track
-        @@other.delete(track.id)
+    tracks.each_key do |k|
+        puts "\tAfter Voting... tracks: #{tracks[k].name} #{tracks[k].album} #{tracks[k].votes.size()}"
     end
 
-    tracks.each do |t|
-        puts "\tTrack: #{t}"
-    end
+    # TODO: Glue all the tracks back togethe
 
     redirect "/"
 end
