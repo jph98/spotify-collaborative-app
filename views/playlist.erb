@@ -2,57 +2,53 @@
 
 	<div class="section group" style="margin-top: 20px; margin-bottom: 40px">
 
-		<h2 style="margin-bottom: 20px">Playlist - <%= @playlist.name %> - <%= @playlist.id %></h2>
+		<h2 style="margin-bottom: 5px">Playlist - <%= @playlist.name %> - <%= @playlist.id %></h2>
 
-			<form class="form-horizontal" role="form" method="POST" target="/tracksearch">
-				<div class="form-group">
-			            <label for="channelcontrol" class="col-sm-2 control-label">Search for track:</label>	
-			            
-			            <div class="col-sm-10">
-			            	<input type="textfield"/>
-			            </div>
-				</div>
-			</form>
+		<h3 style="margin-top: 60px; margin-bottom: 20px">Search</h3>
+
+		<form class="form-horizontal" role="form" method="POST" target="/tracksearch">
+			<div class="form-group">
+		            <label for="channelcontrol" class="col-sm-2 control-label">Track:</label>	
+		            <div class="col-sm-10">
+		            	<input type="textfield"/>
+		            </div>
+			</div>
+		</form>
 	</div>	
 
+	<!-- Currently playing song -->
 	<div class="section group">
 
 		<h3 style="margin-top: 40px; margin-bottom: 20px">Currently Playing<img style="margin-left: 10px" src="/playing.jpg"></img></h3>
 
-		<!-- Currently playing song -->
-		<% @@trackinfo.each_key do |t| %>
+		<table id="currentlyplaying" class="display" cellspacing="0" width="100%">
 
-			<% if @artist.eql? @@trackinfo[t].artist and @title.eql? @@trackinfo[t].name %>						
-				<table id="currentlyplaying" class="display" cellspacing="0" width="100%">
-
-					<thead>
-					   <th>Cover</th>
-					   <th>Artist</th>
-					   <th>Track</th>
-					   <th>Length (secs)</th>
-					   <th>Explicit</th>
-					   <th>No. Votes</th>
-					</thead>
-					<tr>
-						<td><img src="<%= @@trackinfo[t].imagefullsize["url"] %>"></img></td>
-						<td id="artist">
-							<a href='<%= t %>'>
-								<%= @@trackinfo[t].artist %>
-							</a>
-						</td>
-						<td id="title"><%= @@trackinfo[t].name %></td>
-						<td><%= @@trackinfo[t].duration_ms / 1000 %></td>
-						<td><%= @@trackinfo[t].explicit %></td>
-						<td><%= @@trackinfo[t].votes.size() %></td>
-					</tr>
-				</table>
-
-			<% end %>
-		<% end %>
+			<thead>
+			   <th>Cover</th>
+			   <th>Artist</th>
+			   <th>Track</th>
+			   <th>Length (secs)</th>
+			   <th>Explicit</th>
+			   <th>No. Votes</th>
+			</thead>
+			<tr>
+				<td><img src="<%= @@playing.imagefullsize["url"] %>"></img></td>
+				<td id="artist">
+					<a href='<%= @@playing.id %>'>
+						<%= @@playing.artist %>
+					</a>
+				</td>
+				<td id="title"><%= @@playing.name %></td>
+				<td><%= @@playing.duration_ms / 1000 %></td>
+				<td><%= @@playing.explicit %></td>
+				<td><%= @@playing.votes.size() %></td>
+			</tr>
+		</table>
 
 		<h3 style="margin-top: 60px; margin-bottom: 20px">Up Next...</h3>
 
-		<!-- Display the remaining songs to vote on -->
+		<!-- Display voted songs -->
+
 		<table id="tracks" class="display" cellspacing="0" width="100%">
 
 			<thead>
@@ -66,59 +62,110 @@
 			</thead>
 
 			<tbody>
-				<% unless @@trackinfo.size.eql? 0 %>					
+				<% @@voted.each_key do |t| %>
 
-					<% advanced_past_current = false %>
+					<tr>	
+						<td>								
+							<img src="<%= @@voted[t].imagepreview["url"] %>"></img>
+						</td>
+						<td id="artist">
+							<a href='<%= t %>'>
+								<%= @@voted[t].artist %>
+							</a>
+						</td>
+						<td id="title"><%= @@voted[t].name %></td>
+						<td><%= @@voted[t].duration_ms / 1000 %></td>
+						<td><%= @@voted[t].explicit %></td>
+						<td><%= @@voted[t].votes.size() %></td>
+						<td>
+							<% if !@@voted[t].votes.include? request.ip %>
 
-					<% @@trackinfo.each_key do |t| %>
+								<form action="/vote" method="POST">
 
-						<% if advanced_past_current %>						
-						<tr>	
-							
-							<td>								
-								<img src="<%= @@trackinfo[t].imagepreview["url"] %>"></img>
-							</td>
-							<td id="artist">
-								<a href='<%= t %>'>
-									<%= @@trackinfo[t].artist %>
-								</a>
-							</td>
-							<td id="title"><%= @@trackinfo[t].name %></td>
-							<td><%= @@trackinfo[t].duration_ms / 1000 %></td>
-							<td><%= @@trackinfo[t].explicit %></td>
-							<td><%= @@trackinfo[t].votes.size() %></td>
-							<td>
-								<!-- TODO: Only allow user to vote if:
-									* after currently playing song
-									* user hasn't voted already
-									* this is not the current song
-								-->
-								<% if advanced_past_current and !@@trackinfo[t].votes.include? request.ip and !@artist.eql? @@trackinfo[t].artist and !@title.eql? @@trackinfo[t].name %>
+									<input type="hidden" name="vote" value="<%= t %>">
+									<input type="submit" id="" type="button" class="btn btn-success" value="vote up"></input>
 
-									<form action="/vote" method="POST">
+								</form>
 
-										<input type="hidden" name="vote" value="<%= t %>">
-										<input type="submit" id="" type="button" class="btn btn-success" value="vote up"></input>
-
-									</form>
-
-								<% end %>
-							</td>
-						</tr>
-						<% end %>
-
-						<% if @artist.eql? @@trackinfo[t].artist and @title.eql? @@trackinfo[t].name %>
-							
-							<% advanced_past_current = true %>
-
-						<% end %>
-
-					<% end %>
+							<% end %>
+						</td>
+					</tr>
 
 				<% end %>
+
+				<!-- Display other (songs that have not been voted on -->
+				<% @@other.each_key do |t| %>
+
+					<tr>	
+						<td>								
+							<img src="<%= @@other[t].imagepreview["url"] %>"></img>
+						</td>
+						<td id="artist">
+							<a href='<%= t %>'>
+								<%= @@other[t].artist %>
+							</a>
+						</td>
+						<td id="title"><%= @@other[t].name %></td>
+						<td><%= @@other[t].duration_ms / 1000 %></td>
+						<td><%= @@other[t].explicit %></td>
+						<td><%= @@other[t].votes.size() %></td>
+						<td>
+							<% if !@@other[t].votes.include? request.ip %>
+
+								<form action="/vote" method="POST">
+
+									<input type="hidden" name="vote" value="<%= t %>">
+									<input type="submit" id="" type="button" class="btn btn-success" value="vote up"></input>
+
+								</form>
+
+							<% end %>
+						</td>
+					</tr>
+
+				<% end %>
+
 			</tbody>
 
 		</table>
+
+		<h3 style="margin-top: 60px; margin-bottom: 20px">Already Played...</h3>
+
+		<!-- Display played songs -->
+
+		<table id="tracks" class="display" cellspacing="0" width="100%">
+
+			<thead>
+			   <th style="color: grey">Cover</th>
+			   <th style="color: grey">Artist</th>
+			   <th style="color: grey">Track</th>
+			   <th style="color: grey">Length (secs)</th>
+			   <th style="color: grey">Explicit</th>
+			   <th style="color: grey">No. Votes</th>
+			</thead>
+
+			<tbody>
+				<% @@played.each_key do |t| %>
+
+					<tr>	
+						<td>								
+							<img src="<%= @@played[t].imagepreview["url"] %>"></img>
+						</td>
+						<td id="artist" style="color: grey">
+							<%= @@played[t].artist %>
+						</td>
+						<td id="title" style="color: grey"><%= @@played[t].name %></td>
+						<td style="color: grey"><%= @@played[t].duration_ms / 1000 %></td>
+						<td style="color: grey"><%= @@played[t].explicit %></td>
+						<td style="color: grey"><%= @@played[t].votes.size() %></td>
+					</tr>
+
+					<% end %>
+
+			</tbody>
+
+		</table>
+
 	</div>
 
 </div>

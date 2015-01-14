@@ -7,6 +7,15 @@ require "yaml"
 class SpotifyAdapterLinux
 
 	DEBUG = false
+	PREFIX = "dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2"
+
+	def play() 
+		`#{PREFIX} org.mpris.MediaPlayer2.Player.Play`
+	end
+
+	def pause()
+		`#{PREFIX} org.mpris.MediaPlayer2.Player.Pause`
+	end
 
 	def get_metadata()
 		return `dbus-send --print-reply --session --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.freedesktop.DBus.Properties.Get string:'org.mpris.MediaPlayer2.Player' string:'Metadata'`
@@ -18,7 +27,12 @@ class SpotifyAdapterLinux
 
 		metadata = metadata.delete("\n")
 		
-		puts metadata
+		puts metadata if DEBUG
+
+		if metadata.nil? or metadata.eql? ""
+			puts "Could not communicate with local Spotify instance"
+			exit
+		end
 
 		# TODO: Handle dashes etc in title and artist
 		#matches = metadata.match(/xesam\:title\"[\sa-z]+\"([\w\s]+)\"/)

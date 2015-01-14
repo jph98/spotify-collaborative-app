@@ -37,6 +37,30 @@ def get_fullsize_image(images)
     return fullsize
 end
 
+def check_track_vote(trackinfo)
+
+    trackinfo.each_key do |k|
+
+        puts "Key: #{k} id #{params["vote"]}"
+        if k.eql? id
+
+            return trackinfo[k]
+        end    
+    end
+end
+
+def increment_vote(track)
+
+    if !track.votes.include? request.ip
+
+        puts "User #{request.ip} voted for song: #{track.artist} #{track.name}"
+        track.votes << request.ip
+        puts track.votes.size()
+    else
+        puts "User #{request.ip} should not be able to vote for #{t.name}"
+    end
+end
+
 # Configure the initial application
 configure do
 
@@ -47,21 +71,14 @@ configure do
 
     tracks = @@bridge.get_tracks()
 
-    tracks.each do |t|
+    adapter = SpotifyAdapterLinux.new()
+    artist, title = adapter.songinfo()
 
-        # TODO: Either change to an array or split into two lists
-        # (played_songs, voted_songs, to_play_songs)
-        @@trackinfo[t.id] = OpenStruct.new(:name => t.name,
-                                          :album => t.album,
-                                          :artist => t.artists[0].name,
-                                          :duration_ms => t.duration_ms,
-                                          :explicit => t.explicit,
-                                          :external_ids => t.external_ids,
-                                          :track_number => t.track_number,
-                                          :imagepreview => get_preview_image(t.album.images),
-                                          :imagefullsize => get_fullsize_image(t.album.images),
-                                          :votes => [])
-    end
+    @@played, @@playing, @@voted, @@other = @@bridge.get_track_groups(artist, title)
+
+    puts "Played #{@@played.size()}"
+    puts "Voted #{@@voted.size()}"
+    puts "Other #{@@other.size()}"
 
     @playlist = @@bridge.playlist()
 
@@ -120,23 +137,34 @@ post "/vote" do
 
     id = params["vote"]
 
-    @@trackinfo.each_key do |k|
+    tracks = {}
+    @@played.each_key do |p| 
+        tracks[p] = @@played[p]
+    end
 
-        puts "Key: #{k} id #{params["vote"]}"
-        if k.eql? id
+    tracks[@@playing.id] = @@playing
 
-            if !@@trackinfo[k].votes.include? request.ip
+    track = !check_track_vote(@@voted).nil?
 
-                puts "User #{request.ip} voted for song: #{@@trackinfo[k].artist} #{@@trackinfo[k].name}"
-                @@trackinfo[k].votes << request.ip
-                puts @@trackinfo[k].votes.size()
-                @@bridge.reorder_tracks(@@trackinfo)
+    if !track.nil?
 
-                break
-            else
-                puts "User #{request.ip} should not be able to vote for #{t.name}"
-            end
-        end    
+        # TODO: Fix returned track from above, TRUE
+        increment_vote(track)
+        @@voted.sort_by { |k,v| v.votes.size() }.reverse
+    end
+
+    track = !check_track_vote(@@other).nil?
+
+    if !track.nil?
+        increment_vote(track)
+        
+        # Move this to the voted tracks
+        @@voted[track.id] = track
+        @@other.delete(track.id)
+    end
+
+    tracks.each do |t|
+        puts "\tTrack: #{t}"
     end
 
     redirect "/"

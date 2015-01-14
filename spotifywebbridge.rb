@@ -56,6 +56,62 @@ class SpotifyWebBridge
 
 	end
 
+	def get_track_groups(artist, title)
+
+		p = RSpotify::Playlist.find(@userid, @playlist.id)
+		found_currently_playing = false
+		playing = ""
+		voted = {}
+		other = {}
+		played = {}
+
+		trackinfo = p.tracks
+
+		trackinfo.each do |t|
+
+			track = build_track(t)
+
+			if track.artist.eql? artist and t.name.eql? title
+
+				playing = track
+				found_currently_playing = true
+				puts "\tPLAYING: #{track.artist} #{track.name}"
+				next
+
+			elsif found_currently_playing and track.votes.size() > 0
+
+				puts "\tVOTED: #{track.artist} #{track.name}"
+				voted[track.id] = track
+			elsif found_currently_playing
+
+				puts "\tOTHER: #{track.artist} #{track.name}"
+				other[track.id] = track
+				puts "Other size: #{other.size()} - #{track.id}"
+			else
+
+				played[track.id] = track
+				puts "\tPLAYED: #{track.artist} #{track.name}"
+			end
+		end
+
+		return played, playing, voted, other
+	end
+
+	def build_track(t)
+
+		return OpenStruct.new(:id => t.id,
+							  :name => t.name,
+                              :album => t.album,
+                              :artist => t.artists[0].name,
+                              :duration_ms => t.duration_ms,
+                              :explicit => t.explicit,
+                              :external_ids => t.external_ids,
+                              :track_number => t.track_number,
+                              :imagepreview => get_preview_image(t.album.images),
+                              :imagefullsize => get_fullsize_image(t.album.images),
+                              :votes => [])
+	end
+
 	def search_tracks(name)
 
 		tracks = RSpotify::Track.search(name)
@@ -100,7 +156,7 @@ class SpotifyWebBridge
 		tracks_to_reorder = tracks_to_reorder.sort_by { |k,v| v.votes.size() }.reverse
 
 		new_tracks = {}
-		
+
 		# Store the old tracks in the playlist in the order they were
 		tracks_played.each_key do |k|
 			new_tracks[k] = tracks_played[k]
