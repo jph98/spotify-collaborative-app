@@ -118,13 +118,6 @@ post "/vote" do
 
     id = params["vote"]
 
-    tracks = {}
-    @@played.each_key do |p| 
-        tracks[p] = @@played[p]
-    end
-
-    tracks[@@playing.id] = @@playing
-
     if check_track_vote(@@voted, id)
         #@@voted.sort_by! { |k,v| v.votes.size() }.reverse
         @@voted.each_key do |k|
@@ -134,13 +127,45 @@ post "/vote" do
     elsif check_track_vote(@@other, id)            
         @@voted[id] = @@other[id]
         @@other.delete(id)
+        puts "Added non voted song to the voted section"
     end
 
-    tracks.each_key do |k|
-        puts "\tAfter Voting... tracks: #{tracks[k].name} #{tracks[k].album} #{tracks[k].votes.size()}"
+    @@voted.each_key do |k|
+        puts "\tVOTED... : #{@@voted[k].name} #{@@voted[k].album} #{@@voted[k].votes.size()}"
     end
 
-    # TODO: Glue all the tracks back togethe
+    @@other.each_key do |k|
+        puts "\nOTHER... : #{@@other[k].name} #{@@other[k].album} #{@@other[k].votes.size()}"
+    end
+
+    tracks = {}
+    puts "\nplayed"
+    @@played.each_key do |p|
+        puts "Played: #{@@played[p].id} #{@@played[p].name} #{@@played[p].artist} #{@@played[p].votes.size}"
+        tracks[p] = @@played[p]
+    end
+
+    tracks[@@playing.id] = @@playing
+
+    puts "\nvoted"
+    @@voted.each_key do |p|
+        puts "Voted: #{@@voted[p].id} #{@@voted[p].name} #{@@voted[p].artist} #{@@voted[p].votes.size}"
+        tracks[p] = @@voted[p]
+    end
+
+    puts "\nother"
+    @@other.each_key do |p|
+        puts "Other: #{@@other[p].id} #{@@other[p].name} #{@@other[p].artist} #{@@other[p].votes.size}"
+        tracks[p] = @@other[p]
+    end
+
+    puts "\nSize: #{tracks.size}, tracks...."
+    tracks.each_key do |p|
+        puts "\n\nTracks: #{tracks[p].name} #{tracks[p].artist} #{tracks[p].votes.size}"
+    end
+
+    @@bridge.store_tracks(tracks)
+
 
     redirect "/"
 end

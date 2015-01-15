@@ -102,7 +102,6 @@ class SpotifyWebBridge
 	    return images[2]
 	end 
 
-	# TODO: Fix me
 	def get_fullsize_image(images)
 
 	    return images[1]
@@ -129,6 +128,25 @@ class SpotifyWebBridge
 		tracks.each do |t|
 			puts "Found track: #{t.name} - #{t.artists[0].name} - #{t.preview_url}" if DEBUG
 		end
+	end
+
+	# https://github.com/guilhermesad/rspotify/blob/master/lib/rspotify/playlist.rb
+	def store_tracks(tracks)
+
+		# TODO: Just move id's around
+		# TODO: Fix the URI issue
+		new_tracks = []
+		playlist = RSpotify::Playlist.find(@userid, @playlist.id)
+		playlist.tracks.each do |k|
+			puts "Spotify Track: #{k.id} #{k.name} #{k.artists[0].name}"
+		end
+
+		tracks.each_key do |k|
+			puts "Trying to find by id: #{tracks[k].id} #{tracks[k].name} #{tracks[k].artist} #{tracks[k].votes.size()}"
+			track = playlist.tracks.find(tracks[k].id)
+			new_tracks = track
+		end		
+		playlist.replace_tracks!(new_tracks)
 	end
 end
 
