@@ -143,6 +143,7 @@ class SpotifyWebBridge
 
 		tracks.each_key do |k|
 			puts "Trying to find by id: #{tracks[k].id} #{tracks[k].name} #{tracks[k].artist} #{tracks[k].votes.size()}"
+			# track = RSpotify::Track.search()
 			track = playlist.tracks.find(tracks[k].id)
 			new_tracks = track
 		end		
