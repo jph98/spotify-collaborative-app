@@ -2,9 +2,9 @@
 
 	<div class="section group" style="margin-top: 20px; margin-bottom: 40px">
 
-		<h2 style="margin-bottom: 5px">Playlist - <%= @playlist.name %> - <%= @playlist.id %></h2>
+		<!-- <h2 style="margin-bottom: 5px">Playlist - <%= @playlist.name %> - <%= @playlist.id %></h2> -->
 
-		<h3 style="margin-top: 60px; margin-bottom: 20px">Search</h3>
+		<!-- <h3 style="margin-top: 60px; margin-bottom: 20px">Search</h3>
 
 		<form class="form-horizontal" role="form" method="POST" target="/tracksearch">
 			<div class="form-group">
@@ -13,37 +13,21 @@
 		            	<input type="textfield"/>
 		            </div>
 			</div>
-		</form>
+		</form> -->
 	</div>	
 
 	<!-- Currently playing song -->
 	<div class="section group">
 
-		<h3 style="margin-top: 40px; margin-bottom: 20px">Currently Playing<img style="margin-left: 10px" src="/playing.jpg"></img></h3>
+		<h3 style="margin-top: 40px; margin-bottom: 20px; text-align: center">
+			Currently Playing - <%= @@playing.artist %> - <%= @@playing.name %>
+			<img style="margin-left: 10px" src="/playing.jpg"></img><br><br>
+			<img src="<%= @@playing.imagefullsize["url"] %>"></img>
+		</h3>
 
-		<table id="currentlyplaying" class="display" cellspacing="0" width="100%">
-
-			<thead>
-			   <th>Cover</th>
-			   <th>Artist</th>
-			   <th>Track</th>
-			   <th>Length (secs)</th>
-			   <th>Explicit</th>
-			   <th>No. Votes</th>
-			</thead>
-			<tr>
-				<td><img src="<%= @@playing.imagefullsize["url"] %>"></img></td>
-				<td id="artist">
-					<a href='<%= @@playing.id %>'>
-						<%= @@playing.artist %>
-					</a>
-				</td>
-				<td id="title"><%= @@playing.name %></td>
-				<td><%= @@playing.duration_ms / 1000 %></td>
-				<td><%= @@playing.explicit %></td>
-				<td><%= @@playing.votes.size() %></td>
-			</tr>
-		</table>
+		<p>
+			
+		</p>
 
 		<h3 style="margin-top: 60px; margin-bottom: 20px">Up Next...</h3>
 
@@ -68,10 +52,8 @@
 						<td>								
 							<img src="<%= @@voted[t].imagepreview["url"] %>"></img>
 						</td>
-						<td id="artist">
-							<a href='<%= t %>'>
-								<%= @@voted[t].artist %>
-							</a>
+						<td id="artist">							
+							<b><%= @@voted[t].artist %></b>							
 						</td>
 						<td id="title"><%= @@voted[t].name %></td>
 						<td><%= @@voted[t].duration_ms / 1000 %></td>
@@ -100,10 +82,8 @@
 						<td>								
 							<img src="<%= @@other[t].imagepreview["url"] %>"></img>
 						</td>
-						<td id="artist">
-							<a href='<%= t %>'>
-								<%= @@other[t].artist %>
-							</a>
+						<td id="artist">							
+							<b><%= @@other[t].artist %></b>
 						</td>
 						<td id="title"><%= @@other[t].name %></td>
 						<td><%= @@other[t].duration_ms / 1000 %></td>
@@ -166,37 +146,20 @@
 
 		</table>
 
+		 <div id="msgs"></div>
+
 	</div>
 
 </div>
 
 <script type="text/javascript">
 
-	// TODO: Poll the server for the next song every 2 seconds or SSE
-	// $(document).ready(function() {
-
-	// 	(function poll(){
-
-	// 	   setTimeout(function(){
-	// 	      $.ajax({ url: "/playing", success: function(data) {
-
-	// 	        console.log("Playing " + JSON.stringify(data));
-
-	// 	        // Iterate through all the table rows, set now playing and remove vote buttons
-	// 	        // $('tbody tr').each(function() {
-
-	// 	        // 	$(this).find('td input:checked').each(function () {
-	// 	        // });
-
-		        
-	// 	        poll();
-
-	// 	      }, dataType: "json"});
-	// 	  }, 4000);
-	// 	})();
-
-	// 	console.log("Check currently playing timer setup");
+	var es = new EventSource('/stream');
+	es.onmessage = function(e) {
 		
-	// });
+		var jsonData = JSON.parse(e.data);
+		console.log(jsonData.artist);
+		console.log(jsonData.title);
+	}
 
 </script>

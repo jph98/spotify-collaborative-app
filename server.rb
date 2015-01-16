@@ -1,8 +1,10 @@
 #!/usr/bin/env ruby
 
 require "sinatra"
+require "sinatra/streaming"
 require "ostruct"
 require "json"
+require "rufus-scheduler"
 
 require_relative "spotifywebbridge"
 require_relative "spotifyadapterlinux"
@@ -10,6 +12,8 @@ require_relative "spotifyadapterlinux"
 # Options
 set :public_folder, "public"
 set :port, 5000
+
+set server: 'thin', connections: []
 
 layout 'layout'
 
@@ -48,7 +52,6 @@ configure do
   	set :show_exceptions, true
 
     @@bridge = SpotifyWebBridge.new()
-    @@trackinfo = {}
 
     tracks = @@bridge.get_tracks()
 
@@ -68,6 +71,14 @@ configure do
         exit
     else
         puts "Loaded playlist: #{@playlist.name}"
+    end
+
+    @@scheduler = Rufus::Scheduler.new()
+    puts "Created scheduler"
+    @@scheduler.every "2s" do
+        puts "Firing scheduler"
+        artist, title = adapter.songinfo()
+        settings.connections.each {|out| out << %Q^data: { "artist": "#{artist}", "title": "#{title}"}\n\n^}
     end
 
     puts "SpotifyBridge started..."    
@@ -101,15 +112,41 @@ get "/" do
    	erb :playlist
 end
 
-get "/playing" do
+get '/stream', provides: 'text/event-stream' do
 
-    content_type :json
-    puts "Requesting currently playing..."
-    adapter = SpotifyAdapterLinux.new()
-    artist, title = adapter.songinfo()
-    puts "Currently playing: #{artist} - #{title}"
-    output = {:artist => "#{artist}", :title => "#{title}"}.to_json
-    return output
+    stream :keep_open do |out|        
+        puts "Received connection: #{out}"
+        settings.connections << out
+        out.callback {settings.connections.delete(out)}
+    end
+end
+
+get '/playing' do
+
+    @scheduler = Rufus::Scheduler.new()
+    puts "Created scheduler"
+    @scheduler.every "3s" do
+        console.log("Firing scheduler")
+        settings.connections.each {|out| out << %Q^data: {"ctrl": "params"}\n\n^}
+    end
+end
+
+# get "/playing" do
+
+#     content_type :json
+#     puts "Requesting currently playing..."
+#     adapter = SpotifyAdapterLinux.new()
+#     artist, title = adapter.songinfo()
+#     puts "Currently playing: #{artist} - #{title}"
+#     output = {:artist => "#{artist}", :title => "#{title}"}.to_json
+#     return output
+# end
+
+get "/search" do
+    
+    @playlist = @@bridge.playlist()    
+
+    erb :search
 end
 
 post "/vote" do

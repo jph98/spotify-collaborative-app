@@ -22,18 +22,40 @@ class SpotifyWebBridge
 		return RSpotify::User.find(@userid)		
 	end
 
+	# See - https://github.com/guilhermesad/rspotify/blob/master/lib/rspotify/user.rb
 	def get_playlists() 
 
-		puts "Get playlist for #{@userid}"
-		user = RSpotify::User.find(@userid)
-		return user.playlists
+		# TODO: List ALL the playlists
+		puts "Get #{@userid}"
+		@user = RSpotify::User.find(@userid)
+
+		offset = 0
+		playlists = @user.playlists(limit: 50, offset: offset)
+		while true			
+			offset += 50
+			more = @user.playlists(limit: 50, offset: offset)
+			puts "Found more... #{offset} #{more.size}"
+			if more.size.eql? 0 
+				break
+			else
+				playlists << more
+			end
+		end
+
+		puts "Found: #{playlists.size}"
+
+		return playlists
 	end
 
 	def get_playlist() 
 
+		puts "Get playlist for name #{@playlistname}"
 		get_playlists().each do |p|
 
+			puts "Name: #{p.id} #{p.name}"
+
 			if p.name.eql? @playlistname
+				puts "Found playlist #{@playlistname}"
 				return p
 			end
 		end
@@ -44,9 +66,9 @@ class SpotifyWebBridge
 
 		track_votes = {}
 
-		@playlist = get_playlist()
+		@playlist = get_playlist()		
 
-		puts "Listing playlistname: #{@playlist.name} [#{@playlist.id}]" if DEBUG
+		puts "\nListing playlistname: #{@playlist.name} [#{@playlist.id}]" if DEBUG
 		p = RSpotify::Playlist.find(@userid, @playlist.id)
 		p.tracks.each do |t|
 			puts "\t - #{t.artists[0].name} - #{t.name} - #{t.uri} - #{t.external_ids} - #{t.explicit} - #{t.popularity}" if DEBUG
@@ -130,24 +152,63 @@ class SpotifyWebBridge
 		end
 	end
 
+	def find_track_in_playlist(playlist, id)
+
+		playlist.tracks.each do |t|
+			if t.id.eql? id
+				return t
+			end
+		end
+	end
+
 	# https://github.com/guilhermesad/rspotify/blob/master/lib/rspotify/playlist.rb
 	def store_tracks(tracks)
 
-		# TODO: Just move id's around
-		# TODO: Fix the URI issue
 		new_tracks = []
-		playlist = RSpotify::Playlist.find(@userid, @playlist.id)
+
+		yml = YAML::load(File.open("creds.yml"))
+		@userid = yml["userid"]
+		@playlistname = yml["collab_playlist_name"]
+		RSpotify.authenticate(yml["access"], yml["secret"])	
+
+		# puts "User creds: #{@user.class_variable_get('@@users_credentials')}"
+
+		# Grab existing tracks for the Spotify playlist
+		playlist = get_playlist()
+
 		playlist.tracks.each do |k|
 			puts "Spotify Track: #{k.id} #{k.name} #{k.artists[0].name}"
 		end
 
+		puts "\n"
+
+		# List the App playlist
+		tracks.each_key do |k|
+			puts "App Track: #{tracks[k].id} #{tracks[k].name} #{tracks[k].artist} #{tracks[k].votes.size()}"
+		end
+
+		puts "\n"
+
+		# Map the "App playlist" over to the "Spotify Playlist"
 		tracks.each_key do |k|
 			puts "Trying to find by id: #{tracks[k].id} #{tracks[k].name} #{tracks[k].artist} #{tracks[k].votes.size()}"
-			# track = RSpotify::Track.search()
-			track = playlist.tracks.find(tracks[k].id)
-			new_tracks = track
+			track = find_track_in_playlist(playlist, tracks[k].id)
+			puts "\tFound #{track.id} - #{track.name}"
+			new_tracks << track
 		end		
-		playlist.replace_tracks!(new_tracks)
+
+		new_tracks.each do |nt|
+			puts "New Track: #{nt.id} - #{nt.name} - #{nt.uri}"
+		end
+
+		puts "Display Name: #{@user.display_name}"
+
+		# Store new playlist		
+
+		# Need to follow this - https://developer.spotify.com/web-api/authorization-guide/#authorization_code_flow
+		playlist.add_tracks!(new_tracks)
+
+		# TODO: Persist the playlist locally instead of using application wide variables
 	end
 end
 

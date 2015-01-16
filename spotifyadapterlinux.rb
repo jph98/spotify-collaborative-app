@@ -32,7 +32,7 @@ class SpotifyAdapterLinux
 		if metadata.nil? or metadata.eql? ""
 			puts "Could not communicate with local Spotify instance"
 			exit
-		end
+		end	
 
 		# TODO: Handle dashes etc in title and artist
 		#matches = metadata.match(/xesam\:title\"[\sa-z]+\"([\w\s]+)\"/)
