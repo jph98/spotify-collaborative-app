@@ -2,16 +2,67 @@
 
 	<div class="section group" style="margin-top: 20px; margin-bottom: 40px">
 
-		<h2 style="margin-bottom: 40px">Search (<%= @playlist.name %> - <%= @playlist.id %>)</h2>	
+		<h2 >Search and Add </h2>
+		<h4 style="margin-bottom: 40px">Playlist: <%= @@playlist.name %> - <%= @@playlist.id %></h4>	
 
-		<form class="form-horizontal" role="form" method="POST" target="/tracksearch">
+		<form class="form-horizontal" method="POST" target="/search">
 			<div class="form-group">
 		            <label for="channelcontrol" class="col-sm-2 control-label">Track:</label>	
 		            <div class="col-sm-10">
-		            	<input type="textfield"/>
+		            	<input id="searchtext" type="textfield" name="searchtext" value="killing"/>
 		            </div>
 			</div>
 		</form>
 	</div>	
+
+</div>
+
+<div class="section group">
+	<% unless @searchtracks.nil? or @searchtracks.empty?%>
+
+		<h3>Search Results</h3>
+
+		<table id="tracks" class="display" cellspacing="0" width="100%">
+
+			<thead>
+			   <th>Add?</th>
+			   <th>Cover</th>
+			   <th>Artist</th>
+			   <th>Track</th>
+			   <th>Length (secs)</th>
+			   <th>Explicit</th>
+			</thead>
+
+			<tbody>
+				<% @searchtracks.each do |s| %>
+
+					<tr>	
+						<td style="padding-right: 20px">
+							<form action="/addtrack" method="POST">
+
+								<input type="hidden" name="vote" value="<%= s.id %>">
+								<input type="submit" type="button" class="btn btn-success" value="Add"></input>
+							</form>
+						</td>
+						<td style="padding-right: 20px">								
+							<img src="<%= s.album.images[1]["url"] %>"></img>		
+						</td>
+						<td id="artist" style="padding-right: 10px">							
+							<b><%= s.artists[0].name %></b>							
+						</td>
+						<td id="title"><%= s.name %></td>
+						<td><%= s.duration_ms / 1000 %></td>
+						<td>
+							<% if s.explicit.eql? true %>
+								<img src="/explicit.png"></img>
+							<% end %>
+						</td>
+					</tr>
+
+				<% end %>
+			</tbody>
+		</table>
+
+	<% end %>
 
 </div>

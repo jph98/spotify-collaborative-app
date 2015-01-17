@@ -66,32 +66,29 @@ class SpotifyWebBridge
 
 		track_votes = {}
 
-		@playlist = get_playlist()		
-
-		puts "\nListing playlistname: #{@playlist.name} [#{@playlist.id}]" if DEBUG
-		p = RSpotify::Playlist.find(@userid, @playlist.id)
-		p.tracks.each do |t|
-			puts "\t - #{t.artists[0].name} - #{t.name} - #{t.uri} - #{t.external_ids} - #{t.explicit} - #{t.popularity}" if DEBUG
+		if @playlist.nil?
+			@playlist = get_playlist()		
 		end
 
-		return p.tracks
+		puts "\nListing playlistname: #{@playlist.name} [#{@playlist.id}]" if DEBUG
+
+		return @playlist.tracks
 
 	end
 
-	def get_track_groups(artist, title)
+	def build_playlists_group_data(artist, title)
 
-		p = RSpotify::Playlist.find(@userid, @playlist.id)
 		found_currently_playing = false
-		playing = ""
+		playing = nil
 		voted = {}
 		other = {}
 		played = {}
 
-		trackinfo = p.tracks
+		trackinfo = @playlist.tracks
 
 		trackinfo.each do |t|
 
-			track = build_track(t)
+			track = build_track_metadata(t)
 
 			if track.artist.eql? artist and t.name.eql? title
 
@@ -129,7 +126,7 @@ class SpotifyWebBridge
 	    return images[1]
 	end
 
-	def build_track(t)
+	def build_track_metadata(t)
 
 		return OpenStruct.new(:id => t.id,
 							  :name => t.name,
@@ -152,10 +149,20 @@ class SpotifyWebBridge
 		end
 	end
 
-	def find_track_in_playlist(playlist, id)
+	def find_track_in_playlist(id)
 
-		playlist.tracks.each do |t|
+		@playlist.tracks.each do |t|
 			if t.id.eql? id
+				return t
+			end
+		end
+	end
+
+	def find_track_by_artist_title(artist, title)
+
+		@playlist.tracks.each do |t|
+
+			if t.artists[0].name.eql? artist and t.name.eql? title
 				return t
 			end
 		end
@@ -174,9 +181,8 @@ class SpotifyWebBridge
 		# puts "User creds: #{@user.class_variable_get('@@users_credentials')}"
 
 		# Grab existing tracks for the Spotify playlist
-		playlist = get_playlist()
 
-		playlist.tracks.each do |k|
+		@playlist.tracks.each do |k|
 			puts "Spotify Track: #{k.id} #{k.name} #{k.artists[0].name}"
 		end
 
@@ -192,7 +198,7 @@ class SpotifyWebBridge
 		# Map the "App playlist" over to the "Spotify Playlist"
 		tracks.each_key do |k|
 			puts "Trying to find by id: #{tracks[k].id} #{tracks[k].name} #{tracks[k].artist} #{tracks[k].votes.size()}"
-			track = find_track_in_playlist(playlist, tracks[k].id)
+			track = find_track_in_playlist(tracks[k].id)
 			puts "\tFound #{track.id} - #{track.name}"
 			new_tracks << track
 		end		
@@ -206,10 +212,13 @@ class SpotifyWebBridge
 		# Store new playlist		
 
 		# Need to follow this - https://developer.spotify.com/web-api/authorization-guide/#authorization_code_flow
-		playlist.add_tracks!(new_tracks)
+
+		# Add local and remote
+		@playlist.add_tracks!(new_tracks)
 
 		# TODO: Persist the playlist locally instead of using application wide variables
 	end
+
 end
 
 if __FILE__ == $0

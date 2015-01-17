@@ -6,22 +6,22 @@ v0.1
 Scheduled Now Playing
 ---------------------
 
-Websocket Option
-* Scheduled job that polls local client - rufus
 * Returns the currently playing song as JSON
 	* If this changes then find the highest voted song and move it to currenty playing (Client Side)
 	* Move the currently playing song to played (Client Side)
 
-AJAX Poll
-* Ask for the currently playing song
-
 Voting
 ------
 
-* Sort the voted list by number of votes
-* Fix the Vote Up button
 * Change vote to AJAX instead of page refresh
 * Move the song up in terms of the client side list
+* Fix rspotify playlist issue
+
+Events
+------
+
+* User that's added a song
+* User who voted for a song
 
 Controls
 --------

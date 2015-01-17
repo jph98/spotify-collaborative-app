@@ -9,12 +9,12 @@ class SpotifyAdapterLinux
 	DEBUG = false
 	PREFIX = "dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2"
 
-	def play() 
-		`#{PREFIX} org.mpris.MediaPlayer2.Player.Play`
+	def playpause() 
+		`#{PREFIX} org.mpris.MediaPlayer2.Player.PlayPause`
 	end
 
-	def pause()
-		`#{PREFIX} org.mpris.MediaPlayer2.Player.Pause`
+	def next() 
+		`#{PREFIX} org.mpris.MediaPlayer2.Player.Next`
 	end
 
 	def get_metadata()

@@ -12,12 +12,104 @@ require_relative "spotifyadapterlinux"
 # Options
 set :public_folder, "public"
 set :port, 5000
-
-set server: 'thin', connections: []
+set :bind, '0.0.0.0'
+set connections: []
+set :server, 'thin'  # or webrick, mongrel
 
 layout 'layout'
 
 DEBUG = false
+
+$client_credentials = {
+  client_id: YAML::load(File.open("creds.yml"))["access"],
+  client_secret: YAML::load(File.open("creds.yml"))["secret"] 
+}
+$callback_url = 'http://localhost:5000'
+
+# Configure the initial application
+configure do
+
+  	set :show_exceptions, true
+
+    @@bridge = SpotifyWebBridge.new()
+
+    tracks = @@bridge.get_tracks()
+
+    should_skip_firing_scheduler = true
+
+    adapter = SpotifyAdapterLinux.new()
+    artist, title = adapter.songinfo()
+
+    @@played, @@playing, @@voted, @@other = @@bridge.build_playlists_group_data(artist, title)
+
+    puts "\nGroup Data:"
+    puts "Played #{@@played.size()}"
+    puts "Playing #{@@playing.size()}"
+    puts "Voted #{@@voted.size()}"
+    puts "Other #{@@other.size()}"
+
+    @@playlist = @@bridge.playlist()
+
+    if @@playlist.nil?
+        puts "Could not talk to api.spotify.com"  
+        exit
+    else
+        puts "Loaded playlist: #{@@playlist.name}"
+    end
+
+    @@scheduler = Rufus::Scheduler.new()
+    puts "Created scheduler"
+    @@scheduler.every "2s" do
+
+        if !should_skip_firing_scheduler
+
+            puts "\n\nCheck scheduler\n\n"
+            artist, title = adapter.songinfo()
+
+            # Current track is not our wrapped track
+            current_track = @@bridge.find_track_by_artist_title(artist, title)
+
+            puts "'#{current_track.artists[0].name}' - '#{@@playing.artist}'" if DEBUG
+            puts "'#{current_track.name}' - '#{@@playing.name}'" if DEBUG
+
+            # If current track has changed
+            if !current_track.artists[0].name.eql? @@playing.artist or 
+               !current_track.name.eql? @@playing.name
+
+                puts "Recalculating server side playlist data..."
+                @@played, @@playing, @@voted, @@other = @@bridge.build_playlists_group_data(artist, title)
+
+                puts "Sending new current_track info: #{current_track.id}"
+                imageurl = current_track.album.images[1]["url"]
+                
+                settings.connections.each { |out| out <<  %Q^data: { "id": "#{current_track.id}", "name": "#{current_track.name}", "imageurl": "#{imageurl}", "artist": "#{current_track.artists[0].name}" }\n\n^}
+            else
+                puts "\tSkip sending new track"
+            end
+        else
+            puts "\n\nSkipping firing scheduler\n\n"
+            should_skip_firing_scheduler = false
+        end
+    end
+
+    puts "SpotifyBridge started..."    
+end
+
+# Before each request
+before do
+end
+
+# Global error
+error do
+
+  	e = request.env['sinatra.error']
+  	puts e.to_s
+  	puts e.backtrace.join("\n")
+end
+
+##################################################
+# ROUTES
+##################################################
 
 def check_track_vote(trackinfo, id)
 
@@ -46,68 +138,37 @@ def increment_vote(track)
     end
 end
 
-# Configure the initial application
-configure do
-
-  	set :show_exceptions, true
-
-    @@bridge = SpotifyWebBridge.new()
-
-    tracks = @@bridge.get_tracks()
-
-    adapter = SpotifyAdapterLinux.new()
-    artist, title = adapter.songinfo()
-
-    @@played, @@playing, @@voted, @@other = @@bridge.get_track_groups(artist, title)
-
-    puts "Played #{@@played.size()}"
-    puts "Voted #{@@voted.size()}"
-    puts "Other #{@@other.size()}"
-
-    @playlist = @@bridge.playlist()
-
-    if @playlist.nil?
-        puts "Could not talk to api.spotify.com"  
-        exit
-    else
-        puts "Loaded playlist: #{@playlist.name}"
-    end
-
-    @@scheduler = Rufus::Scheduler.new()
-    puts "Created scheduler"
-    @@scheduler.every "2s" do
-        puts "Firing scheduler"
-        artist, title = adapter.songinfo()
-        settings.connections.each {|out| out << %Q^data: { "artist": "#{artist}", "title": "#{title}"}\n\n^}
-    end
-
-    puts "SpotifyBridge started..."    
-end
-
-# Before each request
-before do
-end
-
-# Global error
-error do
-
-  	e = request.env['sinatra.error']
-  	puts e.to_s
-  	puts e.backtrace.join("\n")
-end
-
-##################################################
-# ROUTES
-##################################################
-
 get "/" do
+    if session[:user]
+        user = RSpotify::User.from_credentials(user[:credentials])
+        puts "Hello, #{session[:user][:name]}. You have #{user.playlists.count} playlists"
+    else
+        client_id = $client_credentials[:client_id]
+        scope = 'playlist-modify-public user-read-private'
+
+        "<a href='https://accounts.spotify.com/authorize?client_id=#{client_id}&response_type=code&scope=#{scope}&redirect_uri=#{$callback_url}&show_dialog=true'>Login</a>"
+    end
+end
+
+get "/login/spotify" do
+
+  credentials = RSpotify.exchange_code(params[:code], $callback_url, $client_credentials)
+  user = RSpotify::User.from_credentials(credentials)
+
+  session[:user] = {
+    name: user.name,
+    credentials: user.credentials
+  }
+
+  redirect to("/")
+end
+
+get "/playlist" do
 
     adapter = SpotifyAdapterLinux.new()
     @artist, @title = adapter.songinfo()
 
     puts "Currently playing: #{@artist} - #{@title}"
-
-    @playlist = @@bridge.playlist()    
 
    	erb :playlist
 end
@@ -118,16 +179,6 @@ get '/stream', provides: 'text/event-stream' do
         puts "Received connection: #{out}"
         settings.connections << out
         out.callback {settings.connections.delete(out)}
-    end
-end
-
-get '/playing' do
-
-    @scheduler = Rufus::Scheduler.new()
-    puts "Created scheduler"
-    @scheduler.every "3s" do
-        console.log("Firing scheduler")
-        settings.connections.each {|out| out << %Q^data: {"ctrl": "params"}\n\n^}
     end
 end
 
@@ -144,10 +195,45 @@ end
 
 get "/search" do
     
-    @playlist = @@bridge.playlist()    
+    erb :search
+end
+
+post "/search" do
+    
+    searchtext = params["searchtext"]
+    puts "Searching for #{searchtext}"
+    
+    @searchtracks = @@bridge.search_tracks(searchtext)
+    @searchtracks.each do |t|
+        puts "Found: #{t.name}"
+    end
 
     erb :search
 end
+
+post "/addtrack" do
+    
+    trackid = params["trackid"]
+    puts "Adding: #{trackid}"
+
+    @@bridge.find_track()    
+    @@bridge.add_track()
+
+    erb :search
+end
+
+post "/playpause" do
+
+    adapter = SpotifyAdapterLinux.new()
+    adapter.playpause()    
+end
+
+post "/next" do
+
+    adapter = SpotifyAdapterLinux.new()
+    adapter.next()    
+end
+
 
 post "/vote" do
 
