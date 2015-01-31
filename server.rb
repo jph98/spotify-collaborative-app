@@ -4,10 +4,8 @@ require "sinatra"
 require "sinatra/streaming"
 require "ostruct"
 require "json"
-require "rufus-scheduler"
 
 require_relative "spotifywebbridge"
-require_relative "spotifyadapterlinux"
 
 # Options
 set :public_folder, "public"
@@ -35,10 +33,8 @@ configure do
 
     tracks = @@bridge.get_tracks()
 
-    should_skip_firing_scheduler = true
 
-    adapter = SpotifyAdapterLinux.new()
-    artist, title = adapter.songinfo()
+    # TODO: Get the currently playing artist, title
 
     @@played, @@playing, @@voted, @@other = @@bridge.build_playlists_group_data(artist, title)
 
@@ -57,40 +53,9 @@ configure do
         puts "Loaded playlist: #{@@playlist.name}"
     end
 
-    @@scheduler = Rufus::Scheduler.new()
-    puts "Created scheduler"
-    @@scheduler.every "2s" do
-
-        if !should_skip_firing_scheduler
-
-            puts "\n\nCheck scheduler\n\n"
-            artist, title = adapter.songinfo()
-
-            # Current track is not our wrapped track
-            current_track = @@bridge.find_track_by_artist_title(artist, title)
-
-            puts "'#{current_track.artists[0].name}' - '#{@@playing.artist}'" if DEBUG
-            puts "'#{current_track.name}' - '#{@@playing.name}'" if DEBUG
-
-            # If current track has changed
-            if !current_track.artists[0].name.eql? @@playing.artist or 
-               !current_track.name.eql? @@playing.name
-
-                puts "Recalculating server side playlist data..."
-                @@played, @@playing, @@voted, @@other = @@bridge.build_playlists_group_data(artist, title)
-
-                puts "Sending new current_track info: #{current_track.id}"
-                imageurl = current_track.album.images[1]["url"]
-                
-                settings.connections.each { |out| out <<  %Q^data: { "id": "#{current_track.id}", "name": "#{current_track.name}", "imageurl": "#{imageurl}", "artist": "#{current_track.artists[0].name}" }\n\n^}
-            else
-                puts "\tSkip sending new track"
-            end
-        else
-            puts "\n\nSkipping firing scheduler\n\n"
-            should_skip_firing_scheduler = false
-        end
-    end
+    # TODO: Current track id
+    imageurl = current_track.album.images[1]["url"]
+    settings.connections.each { |out| out <<  %Q^data: { "id": "#{current_track.id}", "name": "#{current_track.name}", "imageurl": "#{imageurl}", "artist": "#{current_track.artists[0].name}" }\n\n^}
 
     puts "SpotifyBridge started..."    
 end
@@ -165,8 +130,9 @@ end
 
 get "/playlist" do
 
-    adapter = SpotifyAdapterLinux.new()
-    @artist, @title = adapter.songinfo()
+    # adapter = SpotifyAdapterLinux.new()
+    # @artist, @title = adapter.songinfo()
+    # TODO: Get the currently playing artist, title
 
     puts "Currently playing: #{@artist} - #{@title}"
 
@@ -183,7 +149,6 @@ get '/stream', provides: 'text/event-stream' do
 end
 
 # get "/playing" do
-
 #     content_type :json
 #     puts "Requesting currently playing..."
 #     adapter = SpotifyAdapterLinux.new()
@@ -222,18 +187,17 @@ post "/addtrack" do
     erb :search
 end
 
-post "/playpause" do
+# post "/playpause" do
 
-    adapter = SpotifyAdapterLinux.new()
-    adapter.playpause()    
-end
+#     adapter = SpotifyAdapterLinux.new()
+#     adapter.playpause()    
+# end
 
-post "/next" do
+# post "/next" do
 
-    adapter = SpotifyAdapterLinux.new()
-    adapter.next()    
-end
-
+#     adapter = SpotifyAdapterLinux.new()
+#     adapter.next()    
+# end
 
 post "/vote" do
 
